@@ -22,6 +22,7 @@ import pandas as pd
 class Anal_class:
     def __init__(self):
         self.timepointlist=[0,2,4,6,8,12,16,24]
+        self.data=''
 
     def Analeachcomponents(self,SampleDF,compmetaboDF):
         import matplotlib.cm as cm
@@ -296,12 +297,13 @@ class Anal_class:
             QvalueBH.index= list(metagenes.index)
             genelist = list(QvalueBH[QvalueBH[0]<qvalcutoff].index)#[namedict[i] for i in list(QvalueBH.index)]
             modules[metagenes.columns[ii]] = genelist
+            if self.data !=  'Metabolome':
 
-            for j in ['KEGG_2019_Mouse','TRANSFAC_and_JASPAR_PWMs','MSigDB_Computational','Disease_Perturbations_from_GEO_down','Disease_Perturbations_from_GEO_up','GO_Biological_Process_2021']:
-                try:
-                    print(self.enrichr(genelist,j))
-                except:
-                    print('error_' +str(ii+1)+j)
+                for j in ['KEGG_2019_Mouse','TRANSFAC_and_JASPAR_PWMs','MSigDB_Computational','Disease_Perturbations_from_GEO_down','Disease_Perturbations_from_GEO_up','GO_Biological_Process_2021']:
+                    try:
+                        print(self.enrichr(genelist,j))
+                    except:
+                        print('error_' +str(ii+1)+j)
         return( modules)        
             #TensorClss.Reconstruction_Timecourse_miceFasting(LiverNewDF.loc[genelist],OptionDict,'_'+str(ii+1))
 
@@ -362,16 +364,36 @@ class Anal_class:
         ax1.set_xticklabels(labels=xticks,rotation=270,fontsize=xsize)    
         xmin, xmax, ymin, ymax = ax1.axis() 
 
-
+    def plotCovRatio(self,cov_ratio):
+      #Explanatory Percentage of Variance Plot
+      num_var = len(cov_ratio)
+      x_tick = np.arange(1,num_var+1)
+      plt.bar(x_tick, cov_ratio)
+      plt.plot(x_tick, np.cumsum(cov_ratio),'-o', mfc='none',mec='b',mew=2,linewidth=3)
+      plt.xticks(x_tick, fontsize=40)#20
+      plt.yticks(fontsize=40)#20
+    
+      plt.axis([1-0.4, num_var+0.5, 0,1])
+      plt.xlabel("Number of IC", fontsize=40)#10
+      plt.ylabel("Explained variance ratio", fontsize=40)#10
+      plt.rcParams['axes.linewidth'] = 1.5
             
-    def PypeR_MetabanalystEnrich(self,pcorr_mtr, SwitchDict):
+    def PypeR_MetabanalystEnrich(self,DF, MetabID):
         import pyper        
-        # R のインスタンスを作る
+        #
         r = pyper.R(use_numpy = 'True', use_pandas='True')
+        r.assign("MetabID", MetabID)
+        r.assign("DF", DF)
+
         
-        r.assign("data", pcorr_mtr)
-        r.assign("filename", SwitchDict['file_name'])
-        data=r.get("data")
+        r('install.packages("MetaboAnalystR")')
+        r('install.packages("installr")')
+        r('install.packages("xlsx", dep=T)')
+
+        r("library(MetaboAnalystR)")
+        r("library(installr)")
+        r("library(xlsx)")
+
         r("'+' <- function(e1, e2) { \
       if (is.character(c(e1, e2))) { \
         paste(e1, e2, sep = '') \
@@ -379,88 +401,44 @@ class Anal_class:
         base::'+'(e1, e2) \
       } \
     }")
-        r("file_name1 <- filename")
-        r('file_name2 <- "c"')
-        r("today <- Sys.Date()")
-        r("Today = strftime(today, format='%Y%m%d')")
-        
-        r("save_dir <- '/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/' + Today + '/' + file_name1 + '/'")
-        r('if (!file.exists(save_dir)) \
-    { \
-      dir.create(save_dir) \
-    }')
-        result = r.get("save_dir")
-        print(result)
-        r('cov_select<-function(model=x, cov=y, n.obs=0, AIC=0, cov_orig=NULL){ \
-          require(ggm) \
-          if(is.null(cov_orig)){cov_orig<-cov} \
-          #  print(sprintf("AIC= %.4f", AIC ),quote=F) \
-          # 偏相関行列を作成 \
-          pmat<- (-1)*solve(cov) / sqrt(diag(solve(cov)) %*% t(diag(solve(cov)))) \
-          diag(pmat)<- 1 \
-          #偏相関係数を絶対値に変換\
-          amat<-abs(pmat) \
-          #モデルの係数が0の箇所を無限大に設定 \
-          amat[which(model==0)]<-Inf \
-          #偏相関の絶対値が最小の要素を0にした修正モデルを作成\
-          model_post<-rep(1,nrow(cov))%*%t(rep(1,nrow(cov)))\
-          model_post[which.min(amat)]<-0 \
-          model_post<-model_post * t(model_post) * model \
-          # モデルのフィットとAICの算出 \
-          f<-fitConGraph(model_post,cov_orig,n.obs) \
-          AIC_post<-f$dev-2*f$df \
-          # モデルの適合度が最大になるまで反復 \
-          if (AIC_post<AIC){ \
-            Recall(model_post,f$Shat,n.obs,AIC=AIC_post,cov_orig=cov_orig) \
-          } \
-          #最終的に得られたモデルを描画 & 偏相関行列を表示 \
-          else{ \
-            diag(pmat)<-1 \
-            pmat[which(model==0)]<-0 \
-            model.0<-model*0 \
-            f<-fitConGraph(model,cov_orig,n.obs) \
-            f.0<-fitConGraph(model.0,cov_orig,n.obs) \
-            # GFIの算出 \
-            S<-cov2cor(cov_orig) \
-            H<-cov2cor(f$Shat) \
-            p<-nrow(cov_orig) \
-            num<-sum(diag((solve(H)%*%(S-H))%*%(solve(H)%*%(S-H)))) \
-            den<-sum(diag((solve(H)%*%S)%*%(solve(H)%*%S))) \
-            GFI<-1-(num/den) \
-            AGFI<-1-(p*(p+1)*(1-GFI))/(2*f$df) \
-            RMSEA<-sqrt(max(((f$dev-f$df)/(f$df*(nrow(cov_orig)-1))),0)) \
-            CFI<-(f.0$dev*f.0$df-f$dev*f$df)/(f.0$dev*f.0$df)\
-            res<-f \
-            res<-c(f,GFI=GFI, AGFI=AGFI,RMSEA=RMSEA,CFI=CFI) \
-            return(list(fit=res,model=model, covmat=pmat)) \
-          } \
-        }')   
-        
-        r('rating_cov<-data')
-        r('rating<-data')
-        r('ncov <- ncol(rating)')
-        r('model_post <- matrix(rep(1, ncov^2), nrow=ncov, ncol=ncov)')
-        r('diag(model_post) <- 0')
-        r('colnames(model_post) <- names(rating)')
-        r('rownames(model_post) <- names(rating)')
-        r('model <- cov_select(model_post, rating_cov, ncov)')
-        
-        r('  Selectedmtr <- matrix(model$covmat,ncol=length(colnames(rating)), nrow=length(rownames(rating)))')
-        r('  colnames(Selectedmtr) <- names(rating)')
-        r('rownames(Selectedmtr) <- names(rating)')
-        result = r.get("Selectedmtr")
-        print(result)
-    
-        r('write.csv(Selectedmtr,save_dir + "/Selectedmtr" + file_name1 + ".csv",append=T, quote=F, col.names=F,fileEncoding = "CP932")')
-        r('write.xlsx(Selectedmtr, file=save_dir + "/Selectedmtr"+ file_name1 + ".xlsx", sheetName="sheet1", row.names=T)')
-    
-        r('qgraph(model$covmat, edge.labels=T, minimum=.2,theme = "Borkulo")')
-        
-        r('pdf(save_dir + "CovarianceSelection_Network.pdf")')
-        #r('plot(qobj$lambda, qobj$pi0.lambda,xlab=xlab,ylab=ylab)')
-        #r('title(main = bquote(π0==.(qobj$pi0)))')
-        r('dev.off()')
-        r("source(file='../../R/CovarianceSelection.R')")
+              #save_dir <- '/Users/fujita/Google ライブ/Kuroda lab/Research/Metabolome/result/Property/20220320/'
+#DF <- read.csv('/Users/fujita/Google ドライブ/Kuroda lab/Research/TransOmics/timecourse_fasting/data_raw_liver.csv')
+
+        r('MetabRnrich <- function(DF,i){ \
+        mSet<-InitDataObjects("conc", "msetora", FALSE) \
+        Metabvec <- c() \
+        for (j in  c(MetaboID$NA.)){ \
+          Metabvec <- append(Metabvec, DF[DF$Name==c(j),]$KEGG.ID)  \
+        }\
+        cmpd.vec<- Metabvec \
+        mSet<-Setup.MapData(mSet, cmpd.vec);\
+        mSet<-CrossReferencing(mSet, "kegg");\
+        mSet<-CreateMappingResultTable(mSet)\
+        mSet<-SetMetabolomeFilter(mSet, F);\
+        mSet<-SetCurrentMsetLib(mSet, "kegg_pathway", 2);\
+        mSet<-CalculateHyperScore(mSet)\
+        mSet<-PlotORA(mSet, "ora_0_", "net", "png", 72, width=NA)\
+        mSet<-PlotEnrichDotPlot(mSet, "ora", "ora_dot_0_", "png", 72, width=NA)\
+        mSet<-CalculateHyperScore(mSet)\
+        mSet<-PlotORA(mSet, "ora_1_", "net", "png", 72, width=NA)\
+        mSet<-PlotEnrichDotPlot(mSet, "ora", "ora_dot_1_", "png", 72, width=NA)\
+        mSet<-CalculateHyperScore(mSet)\
+        mSet<-PlotORA(mSet, "ora_2_", "net", "png", 72, width=NA)\
+        mSet<-PlotEnrichDotPlot(mSet, "ora", "ora_dot_2_", "png", 72, width=NA)\
+        Result<-mSet$api$ora.results\
+        print(Result)\
+        SignPath<-rownames(Result)[Result[,"FDR"]<0.1]\
+        for (i in length(SignPath)){\
+                print(mSet$analSet$ora.hits[SignPath])\
+                }\
+         }\
+        for (i in 1:53){\
+          try(\
+            MetabRnrich(DF,i)\
+          )\
+        }') 
+#EnrichResult=r.get("Result") 
+
         
     def Reconstruction_Timecourse_miceFasting(self,aaDF,OptionDict,save_dir):
         #NewhumanOGTTDF = pd.read_excel('/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/20200727/NewhumanOGTTDF.xlsx',header=0,index_col=0)   
