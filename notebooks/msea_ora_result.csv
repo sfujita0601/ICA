@@ -1,0 +1,18 @@
+"","total","expected","hits","Raw p","Holm p","FDR"
+"Glutathione metabolism",28,0.0552,2,0.000969,0.0814,0.0814
+"Valine, leucine and isoleucine degradation",40,0.0788,2,0.00199,0.165,0.0835
+"Synthesis and degradation of ketone bodies",5,0.00986,1,0.00983,0.806,0.275
+"Butanoate metabolism",15,0.0296,1,0.0293,1,0.385
+"Terpenoid backbone biosynthesis",18,0.0355,1,0.0351,1,0.385
+"Citrate cycle (TCA cycle)",20,0.0394,1,0.0389,1,0.385
+"beta-Alanine metabolism",21,0.0414,1,0.0409,1,0.385
+"Pyruvate metabolism",22,0.0434,1,0.0428,1,0.385
+"Propanoate metabolism",23,0.0453,1,0.0447,1,0.385
+"Lysine degradation",25,0.0493,1,0.0485,1,0.385
+"Glycolysis / Gluconeogenesis",26,0.0512,1,0.0504,1,0.385
+"Inositol phosphate metabolism",30,0.0591,1,0.058,1,0.399
+"Glyoxylate and dicarboxylate metabolism",32,0.0631,1,0.0618,1,0.399
+"Fatty acid elongation",39,0.0769,1,0.075,1,0.413
+"Fatty acid degradation",39,0.0769,1,0.075,1,0.413
+"Tryptophan metabolism",41,0.0808,1,0.0787,1,0.413
+"Fatty acid biosynthesis",47,0.0926,1,0.0899,1,0.444

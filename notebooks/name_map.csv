@@ -1,0 +1,5 @@
+"Query","Match","HMDB","PubChem","KEGG","SMILES","Comment"
+"C00160","Glycolate",NA,"3460","C00160",NA,"1"
+"C00898","Tartaric acid","HMDB0000956","444305","C00898","O[C@H]([C@@H](O)C(O)=O)C(O)=O","1"
+"C00879","Galactaric acid","HMDB0000639","3037582","C00879","[C@@H]([C@@H]([C@H](C(=O)O)O)O)([C@@H](C(=O)O)O)O","1"
+"C00689","Trehalose 6-phosphate","HMDB0001124","122336","C00689","C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)COP(=O)(O)O)O)O)O)O)O)O)O","1"
