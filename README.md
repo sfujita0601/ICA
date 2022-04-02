@@ -3,13 +3,9 @@ Independent Component Analysis of Faesting-mice data.
   
 
 # Notebooks
+- `Main.ipynb` 
 The Jupyter notebook describes the flow of analysis using independent component analysis.
-# Contentes
-- `Main.ipynb`  
-The Jupyter notebook describes the flow of analysis using tensor ecomposition analysis.
 
-- `Helper.py`  
-A python class used for `Main.ipynb`.
 
 # Requirements
 This programs has been tested on the following.  
