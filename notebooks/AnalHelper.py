@@ -427,6 +427,7 @@ class Anal_class:
         mSet<-PlotEnrichDotPlot(mSet, "ora", "ora_dot_2_", "png", 72, width=NA)\
         Result<-mSet$api$ora.results\
         print(Result)\
+        print("aa")\
         SignPath<-rownames(Result)[Result[,"FDR"]<0.1]\
         for (i in length(SignPath)){\
                 print(mSet$analSet$ora.hits[SignPath])\
