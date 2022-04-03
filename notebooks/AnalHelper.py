@@ -266,8 +266,7 @@ class Anal_class:
         if 'ENS' in list(metagenes.index)[0]:
             import mygene
             mg = mygene.MyGeneInfo()
-            ens = list(metagenes.index)#['ENSG00000148795', 'ENSG00000165359', 'ENSG00000150676']
-            #ginfo = mg.querymany(ens, scopes='ensembl.gene')
+            ens = list(metagenes.index)
             geneSyms = mg.querymany(ens , scopes='ensembl.gene', fields='symbol', species='mouse')
             Name=[]
             for j in range(len(geneSyms)):
@@ -308,16 +307,12 @@ class Anal_class:
             #TensorClss.Reconstruction_Timecourse_miceFasting(LiverNewDF.loc[genelist],OptionDict,'_'+str(ii+1))
 
     
-    def mkhistList(self,List1,xlabel,filename,bins,title):#1つのリストのヒストグラム
+    def mkhistList(self,List1,xlabel,filename,bins,title):
             fig = plt.figure(figsize=(6.4,4.8))
             plt.hist(List1,bins=bins,ec='black',align='left' )#,cumulative=1,normed=True)#plt.hist(list1[0:50],bins = 5,normed=True)#, bins = 20)  
-            #alin 各棒の中心を X 軸目盛上のどの横位置で出力するか。 ‘left‘,‘mid‘,‘right‘ から選択。デフォルト値: ‘mid’
-            #plt.xlim([0,1]) #モデルパラメタのとき
+
             plt.xlabel(xlabel,fontsize=20); plt.ylabel('Frequency',fontsize=20);plt.tick_params(labelsize=20);plt.title(title,size=20)
-    ### temp 縦軸をlog10に
-            #plt.yscale('log');#plt.xticks(np.arange(0, 110 + 1, 10)) #np.arange(-110, 20 + 1, 20) np.arange(0, 110 + 1, 10)
-            #plt.savefig(save_dir +  filename +'Hist.pdf',bbox_inches="tight")  ;plt.close()#print(ConList2[4][~np.isnan(ConList2[4])])
-    
+
 
     def mkZscore(self,DF,IndLabel,ColLabel,axis):
         if axis=='col':##zscore in column direction
@@ -401,8 +396,6 @@ class Anal_class:
         base::'+'(e1, e2) \
       } \
     }")
-              #save_dir <- '/Users/fujita/Google ライブ/Kuroda lab/Research/Metabolome/result/Property/20220320/'
-#DF <- read.csv('/Users/fujita/Google ドライブ/Kuroda lab/Research/TransOmics/timecourse_fasting/data_raw_liver.csv')
 
         r('MetabRnrich <- function(DF,i){ \
         mSet<-InitDataObjects("conc", "msetora", FALSE) \
@@ -440,56 +433,5 @@ class Anal_class:
         }') 
 #EnrichResult=r.get("Result") 
 
-        
-    def Reconstruction_Timecourse_miceFasting(self,aaDF,OptionDict,save_dir):
-        #NewhumanOGTTDF = pd.read_excel('/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/20200727/NewhumanOGTTDF.xlsx',header=0,index_col=0)   
-    
-        SubjectName = ['1']*2;#sorted(set(SubjectNameSet), key=SubjectNameSet.index)
-        Timepoint = [0,2,4,6,8,12,16,24]
-        
-        ####
-        #aaDF=DF.loc[:,(DF!=0).any()]
-        #aaDF = DF.loc[list(tensorDF.sort_index().index)]
-        #OptionDict['std']=OptionDict['std'].loc[list(tensorDF.sort_index().index)]
-        ###
-        #aaDF = aaDF.T
-        OptionDict['std'].index=[str(OptionDict['std'].index[i]) for i in range(len(OptionDict['std'].index))]
-        ###
-        TCTClass = TensorClassTimeCourse()
-        
-        #aaDF,aaMolList = TCTClass.metabolome_time(tempMolDF)#metabolomeデータ、時間成分で分ける
-        #aaDF,aaMolList = TCTClass.metabolome_subject(tempMolDF)#metabolomeデータ、個人成分で分ける
-        #aaDF,aaMolList = TCTClass.metabolome_all(tempMolDF)
-       ### aaDF,aaMolList = TCTClass.metabolome_all([])#metabolomeデータ、どの都度設定
-                    #d = r.search(j)     
-        #r.search(jj).group(3)
-                        #r = re.compile("(.*)(_)(.*)") 
-                    #d = r.search(j) 
-    
-        #aaDF = aaDF.drop('name',axis=1);aaDF = aaDF.drop('Label',axis=1);
-        #OptionDict={}
-        OptionDict['switch']='miceFasting_mean'#'BC':#BCの順に描画なら 'BC_all'#まとめ　のやつ、'metabolome'Bolus20 'metabolome_ColorComp':Bolu20, 成分で色分け _Absで絶対値 'miceOGTT_mean', 'miceOGTT'
-        #OptionDict['Compvalue'] = list(pd.read_excel('/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/20201213/metabolome/compsubject.xlsx',header=0,index_col=0)['X6'])
-        ###最新版_20210314
-        #OptionDict['Compvalue'] = list(pd.read_excel('/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/20210314/metabolome/compsubject.xlsx',header=0,index_col=0)['X2'])
-        #OptionDict['Compvalue'] = (OptionDict['Compvalue'] - np.min(OptionDict['Compvalue'])) / (np.max(OptionDict['Compvalue'])-np.min(OptionDict['Compvalue']))
-        #OptionDict['CompvalueTrue'] = list(pd.read_excel('/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/20201213/metabolome/compsubject.xlsx',header=0,index_col=0)['X6'])
-         ###最新版_20210314
-        #OptionDict['CompvalueTrue'] = list(pd.read_excel('/Users/fujita/Google ドライブ/Kuroda lab/Research/Metabolome/result/Property/20210314/metabolome/compsubject.xlsx',header=0,index_col=0)['X2'])
-        
-        aaDF['sort'] = list(aaDF.index)
-        aaDF=aaDF.sort_values(by='sort',ascending=True) 
-        #OptionDict['CompvalueTrue'] = list(np.sort(OptionDict['CompvalueTrue']))
-        #OptionDict['Compvalue']= list(np.sort(OptionDict['Compvalue']))
-        aaDF=aaDF.drop('sort',axis=1)
-        
-        OptionDict['Label'] = list(aaDF.columns)
-        ylim_l, ylim_h, TitleDF = TCTClass.calcylim(aaDF,OptionDict)   
-        aaDF.to_excel(save_dir+'allconcatDF.xlsx')
-        try:
-            OptionDict['std'].to_excel(save_dir+'allconcatDF_std.xlsx')
-        except:
-            pass
-        TCTClass.pltoTimeCourse(aaDF,Timepoint,SubjectName,ylim_l,ylim_h,[],OptionDict,save_dir)
         
         
