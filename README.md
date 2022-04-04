@@ -14,7 +14,7 @@ R version 4.1.2
 
 
 # Data
-Data used for independent component cnalysis.
+Data used for independent component cnalysis is not yet published.
 
 
 
