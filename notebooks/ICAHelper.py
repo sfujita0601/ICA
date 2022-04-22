@@ -100,7 +100,7 @@ class ICA_class:
         metasamples = metasamples.iloc[:,sorted_meta_index].set_axis(metasamples.columns,axis=1,inplace=False)
         return metagenes, metasamples, ICAexplain  
 
-    def ICA4ZscoredGeneSampleMatrix(self,E, k, seed=None)
+    def ICA4ZscoredGeneSampleMatrix(self,E, k, seed=None):
         decomposer = FastICA(n_components=k, random_state=seed,tol=0.00001,max_iter=10000)#max_iter=200, tol=0.0001,デフォルト
         decomposer.fit(E)
         metagenes = pd.DataFrame(decomposer.transform(E), index=E.index, columns=["metagene"+str(i) for i in range(1,k+1)])
